@@ -3,9 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>AppDynamicsTools</groupId>
 	<artifactId>MetricMover</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2</version>
 	<packaging>jar</packaging>
-
+	<url>http://maven.apache.org</url>
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/org.influxdb/influxdb-java -->
 		<dependency>
@@ -47,13 +47,6 @@
 		    <scope>system</scope>
 		    <systemPath>${project.basedir}//execLib/AppDRESTAPI-SDK_2.5.7.jar</systemPath>
 		</dependency>
-<!--		<dependency>-->
-<!--		    <groupId>AppD</groupId>-->
-<!--		    <artifactId>AppDRESTAPI-SDK</artifactId>-->
-<!--		    <version>2.5.7</version>-->
-<!--		    <scope>system</scope>-->
-<!--		    <systemPath>${project.basedir}//execLib/AppDRESTAPI-SDK_2.5.7.jar</systemPath>-->
-<!--		</dependency>-->
 		
         <dependency>
             <groupId>javax.el</groupId>
