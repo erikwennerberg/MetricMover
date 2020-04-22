@@ -49,6 +49,7 @@ public class InfluxDBMover implements Mover {
 		for (BusinessTransaction bt : bts.getBusinessTransactions()) {
 			for (int i = 0; i < 10; i++) {
 				MetricDatas mDatas = access.getRESTBTMetricQuery(i, app, bt.getTierName(), bt.getName(), start, end);
+				access.getRESTGenericMetricQuery();
 				if (mDatas != null) {
 					ArrayList<MetricData> mDataList = mDatas.getMetric_data();
 					if (mDataList != null) {

@@ -1,0 +1,37 @@
+##Controller configuration
+controller_url: 4516controllernoss-4516nosshew-rpdrerjz.srv.ravcloud.com
+controller_port: 8090
+controller_useSSL: false
+controller_user: appd
+controller_passwd: appd
+controller_account: customer1
+controller_app: Cars_Sample
+## epoch times
+controller_start_time: 1586217600
+controller_end_time: 1586967030
+
+
+# metric paths
+metrics:
+  - "PATH1"
+  - "PATH2"
+
+## destination_db should be either elasticsearch or influxDB
+destination_db: influxDB
+#destination_db=influxDB
+
+##Influx db configuration
+influxDB_url: localhost
+influxDB_port: 8086
+influxDB_user: root
+influxDB_passwd: root
+# the name of the database used to store metric data
+influxDB_db_name: rdubts
+
+##Elasticsearch configuration
+#elasticsearch_url=
+#elasticsearch_port=
+#elasticsearch_user=
+#elasticsearch_passwd=
+# the name of the index used to store metric data
+#elasticsearch_index=
