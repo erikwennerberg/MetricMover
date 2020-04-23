@@ -51,14 +51,14 @@ public class InfluxDBMover implements Mover {
 		if (timeInMinutesString != null){
 			long timeInMinutes = Long.parseLong(timeInMinutesString );
 			long now = System.currentTimeMillis() ;
-			start = (now - (timeInMinutes*60000))/ 1000L;
-			end = now / 1000L;
+			start = (now - (timeInMinutes*60000));
+			end = now;
 
 		}
 		//wrapping in debug if loop to avoid date object creation in other cases
 		if(logger.isDebugEnabled()) {
 			logger.debug("Unix time interval from" + start + " to " + end);
-			logger.debug("Date time interval is: " + new java.util.Date(start * 1000) + " to " + new java.util.Date(end * 1000));
+			logger.debug("Date time interval is: " + new java.util.Date(start) + " to " + new java.util.Date(end));
 		}
 
 		InfluxDB influxDB = createDatabase(dbUrl, dbPort, dbuser, dbpasswd, dbName);
