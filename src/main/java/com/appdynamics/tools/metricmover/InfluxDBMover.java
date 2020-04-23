@@ -1,9 +1,6 @@
 package com.appdynamics.tools.metricmover;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import org.appdynamics.appdrestapi.RESTAccess;
@@ -32,8 +29,11 @@ public class InfluxDBMover implements Mover {
 		String user = props.getProperty("controller_user");
 		String passwd = props.getProperty("controller_passwd");
 		String account = props.getProperty("controller_account");
-		List<String> apps = Collections.singletonList(props.getProperty("controller_apps"));
-		List<String> metrics = Collections.singletonList(props.getProperty("controller_metrics"));
+		List<String> apps = Arrays.asList(props.getProperty("controller_apps").split(","));
+		List<String> metrics = Arrays.asList(props.getProperty("controller_metrics").split(","));
+
+		logger.debug("apps found:" + apps);
+		logger.debug("metrics found:" + metrics);
 
 		String dbUrl = props.getProperty("influxDB_url");
 		String dbPort = props.getProperty("influxDB_port");
@@ -46,28 +46,38 @@ public class InfluxDBMover implements Mover {
 
 
 		// if time in minutes was specified we override the start and end properties
-		if (props.getProperty("timeInMinutes") != null){
+		logger.debug("time paramater was passed:" + timeInMinutesString);
+
+		if (timeInMinutesString != null){
 			long timeInMinutes = Long.parseLong(timeInMinutesString );
 			long now = System.currentTimeMillis() ;
 			start = (now - (timeInMinutes*60000))/ 1000L;
 			end = now / 1000L;
+
 		}
-		
+		//wrapping in debug if loop to avoid date object creation in other cases
+		if(logger.isDebugEnabled()) {
+			logger.debug("Unix time interval from" + start + " to " + end);
+			logger.debug("Date time interval is: " + new java.util.Date(start * 1000) + " to " + new java.util.Date(end * 1000));
+		}
+
 		InfluxDB influxDB = createDatabase(dbUrl, dbPort, dbuser, dbpasswd, dbName);
 		
 		RESTAccess access = new RESTAccess(controller, port, useSSL, user, passwd, account);
 		//BusinessTransactions bts = access.getBTSForApplication(app);
 		BatchPoints batchPoints = BatchPoints.database(dbName).retentionPolicy("autogen").consistency(ConsistencyLevel.ALL).build();
 		for (String app : apps ) {
+			logger.debug("processing app " + app );
 			for (String metricPath: metrics) {
+				logger.debug("processing metric path " + metricPath );
 				//MetricDatas mDatas = access.getRESTBTMetricQuery(i, app, bt.getTierName(), bt.getName(), start, end);
 				MetricDatas mDatas = access.getRESTGenericMetricQuery(app,metricPath,start,end,false);
-				if (mDatas != null) {
+				if (mDatas != null && mDatas.getMetric_data().size() > 0) {
 					ArrayList<MetricData> mDataList = mDatas.getMetric_data();
 					if (mDataList != null) {
 						for (MetricData mData : mDataList) {
-							String freq = mData.getFrequency();
-							int mId = mData.getMetricId();
+							//String freq = mData.getFrequency();
+							//int mId = mData.getMetricId();
 							String mPath = mData.getMetricPath();
 							String metricName = getMeasurement(mPath);					
 							//measurement: metricName (from mPath); time: time 
@@ -89,6 +99,8 @@ public class InfluxDBMover implements Mover {
 											long occurrences = mv.getOccurrences();
 											
 											long time = mv.getStartTimeInMillis();
+
+											logger.debug("About to insert metric value into Influx DB: " + mv );
 											Point point = Point.measurement(metricName).time(time, TimeUnit.MILLISECONDS)
 											.addField("count", count).addField("current", current).addField("val", val).addField("max", max).addField("min", min)
 											.addField("sum", sum).addField("std", std).addField("occurrences", occurrences)
@@ -102,7 +114,8 @@ public class InfluxDBMover implements Mover {
 						}						
 					}
 				} else {
-					logger.info("Empty data for " + metricPath + " " + app);
+					logger.info("No data for " + metricPath + " " + app + " for that time interval");
+
 				}
 			}
 			influxDB.write(batchPoints);
