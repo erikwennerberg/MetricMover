@@ -55,15 +55,19 @@ public class InfluxDBMover implements Mover {
 			end = now;
 
 		}
+
+
+		InfluxDB influxDB = createDatabase(dbUrl, dbPort, dbuser, dbpasswd, dbName);
+
+		RESTAccess access = new RESTAccess(controller, port, useSSL, user, passwd, account);
 		//wrapping in debug if loop to avoid date object creation in other cases
 		if(logger.isDebugEnabled()) {
 			logger.debug("Unix time interval from" + start + " to " + end);
 			logger.debug("Date time interval is: " + new java.util.Date(start) + " to " + new java.util.Date(end));
+			access.setDebugLevel(3);
 		}
 
-		InfluxDB influxDB = createDatabase(dbUrl, dbPort, dbuser, dbpasswd, dbName);
-		
-		RESTAccess access = new RESTAccess(controller, port, useSSL, user, passwd, account);
+
 		//BusinessTransactions bts = access.getBTSForApplication(app);
 		BatchPoints batchPoints = BatchPoints.database(dbName).retentionPolicy("autogen").consistency(ConsistencyLevel.ALL).build();
 		for (String app : apps ) {
@@ -71,6 +75,9 @@ public class InfluxDBMover implements Mover {
 			for (String metricPath: metrics) {
 				logger.debug("processing metric path " + metricPath );
 				//MetricDatas mDatas = access.getRESTBTMetricQuery(i, app, bt.getTierName(), bt.getName(), start, end);
+
+
+
 				MetricDatas mDatas = access.getRESTGenericMetricQuery(app,metricPath,start,end,false);
 				if (mDatas != null && mDatas.getMetric_data().size() > 0) {
 					ArrayList<MetricData> mDataList = mDatas.getMetric_data();
