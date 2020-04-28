@@ -10,10 +10,12 @@ A utility that moves metric data from AppDynamics Controller for a time period t
 
 <h2>Steps to use</h2>
 
-1. Download the zip file from
+0. Download the zip file from
 https://github.com/erikwennerberg/MetricMover
 
-2. Unzip the file on your local machine
+1. Unzip the file on your local machine
+
+2. Edit app.properties and add metric paths, controller info etc...
 
 3. cd into the unzipped folder MetricMover
 
